@@ -174,3 +174,108 @@ uint8_t ssd1306_oled_set_contrast(uint8_t value)
     oled_cmd(0x81);
     return oled_cmd(value);
 }
+
+
+uint8_t ssd1306_oled_draw_pixel_hline(uint8_t y_pixel,
+                                      uint8_t c1,
+                                      uint8_t c2)
+{
+    if (y_pixel >= SSD1306_HEIGHT)
+        return 1;
+
+    if (c1 >= SSD1306_WIDTH || c2 >= SSD1306_WIDTH)
+        return 1;
+
+    if (c1 > c2)
+    {
+        uint8_t tmp = c1;
+        c1 = c2;
+        c2 = tmp;
+    }
+
+    uint8_t page = y_pixel / 8;
+    uint8_t bit  = y_pixel % 8;
+
+    uint8_t mask = (1 << bit);
+
+    uint8_t length = c2 - c1 + 1;
+
+    /* Move to correct page + column */
+    if (ssd1306_oled_set_XY(c1, page))
+        return 1;
+
+    uint8_t buffer[SSD1306_WIDTH];
+
+    for (uint8_t i = 0; i < length; i++)
+        buffer[i] = mask;
+
+    return oled_data_stream(buffer, length);
+}
+
+
+uint8_t ssd1306_oled_draw_pixel_vline(uint8_t x_pixel,
+                                      uint8_t y1,
+                                      uint8_t y2)
+{
+    if (x_pixel >= SSD1306_WIDTH)
+        return 1;
+
+    if (y1 >= SSD1306_HEIGHT || y2 >= SSD1306_HEIGHT)
+        return 1;
+
+    if (y1 > y2)
+    {
+        uint8_t tmp = y1;
+        y1 = y2;
+        y2 = tmp;
+    }
+
+    uint8_t start_page = y1 / 8;
+    uint8_t end_page   = y2 / 8;
+
+    for (uint8_t page = start_page; page <= end_page; page++)
+    {
+        uint8_t start_bit = 0;
+        uint8_t end_bit   = 7;
+
+        if (page == start_page)
+            start_bit = y1 % 8;
+
+        if (page == end_page)
+            end_bit = y2 % 8;
+
+        uint8_t mask = 0;
+
+        for (uint8_t bit = start_bit; bit <= end_bit; bit++)
+            mask |= (1 << bit);
+
+        /* Move cursor to column and page */
+        if (ssd1306_oled_set_XY(x_pixel, page))
+            return 1;
+
+        /* Send single data byte */
+        uint8_t buffer[2];
+        buffer[0] = SSD1306_DATA_CONTROL_BYTE;
+        buffer[1] = mask;
+
+        if (_i2c_write(buffer, 2))
+            return 1;
+    }
+
+    return 0;
+}
+
+
+
+void ssd1306_oled_puts_center(uint8_t page, const char *str)
+{
+    uint8_t len = strlen(str);
+    if (len > 16) len = 16;
+
+    uint8_t start_col = (16 - len) / 2;
+
+    ssd1306_oled_set_XY(start_col * 8, page);
+    ssd1306_oled_puts(SSD1306_FONT_NORMAL, str);
+}
+
+
