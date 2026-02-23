@@ -28,5 +28,10 @@ void ssd1306_oled_puts(uint8_t size, const char* str);
 
 uint8_t ssd1306_oled_onoff(uint8_t onoff);
 uint8_t ssd1306_oled_set_contrast(uint8_t value);
+uint8_t ssd1306_oled_draw_pixel_hline(uint8_t y_pixel,uint8_t c1, uint8_t c2);
+uint8_t ssd1306_oled_draw_pixel_vline(uint8_t x_pixel,
+                                      uint8_t y1,
+                                      uint8_t y2);
+void ssd1306_oled_puts_center(uint8_t page, const char *str);
 
 #endif
