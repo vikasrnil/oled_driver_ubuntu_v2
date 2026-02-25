@@ -50,12 +50,15 @@ void get_ip_and_interface(char *ip, char *iface)
     freeifaddrs(ifaddr);
 }
 
+
 /* ---------------- DISPLAY FUNCTION ---------------- */
+
 void display_system_info(void)
 {
     char hostname[64];
     char ip[64];
     char iface[32];
+    char buffer[128];
 
     get_hostname(hostname, sizeof(hostname));
     get_ip_and_interface(ip, iface);
@@ -63,22 +66,20 @@ void display_system_info(void)
     ssd1306_oled_clear_screen();
 
     /* Hostname */
-//    ssd1306_oled_set_XY(0, 0);
-//    ssd1306_oled_puts(SSD1306_FONT_NORMAL, "Hostname:");
-//    ssd1306_oled_set_XY(0, 1);
-    ssd1306_oled_puts_center(2, hostname);
+    snprintf(buffer, sizeof(buffer), "Hostname: %s", hostname);
+    ssd1306_oled_puts_center(2, buffer);
+    memset(buffer,0,sizeof(buffer));
 
     /* IP */
-   // ssd1306_oled_set_XY(0, 4);
-   // ssd1306_oled_puts(SSD1306_FONT_NORMAL, "IP:");
-   // ssd1306_oled_set_XY(0, 5);
     ssd1306_oled_draw_pixel_hline(28, 10, 118);
-    ssd1306_oled_puts_center(4, ip);
-    ssd1306_oled_draw_pixel_hline(42, 10, 118); 
-    /* Interface */
-   // ssd1306_oled_set_XY(0, 6);
-    ssd1306_oled_draw_pixel_hline(44, 10, 118);
-    ssd1306_oled_puts_center(6, iface);
+    snprintf(buffer, sizeof(buffer), "IP: %s", ip);
+    ssd1306_oled_puts_center(4, buffer);
+    ssd1306_oled_draw_pixel_hline(42, 10, 118);
+    memset(buffer,0,sizeof(buffer));
 
+    /* Interface */
+    snprintf(buffer, sizeof(buffer), "Interface: %s", iface);
+    ssd1306_oled_puts_center(6, buffer);
+    memset(buffer,0,sizeof(buffer));
 }
 
