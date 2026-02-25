@@ -137,18 +137,23 @@ static void ssd1306_oled_write_char(uint8_t size, char c)
     if (c < 0x20 || c > 0x7E)
         c = '?';
 
-    if (global_x + width >= SSD1306_WIDTH)
+    if(global_x + width + 1 >= SSD1306_WIDTH)
     {
         global_x = 0;
         global_y++;
         ssd1306_oled_set_XY(global_x, global_y);
     }
 
-    const uint8_t *glyph = &font_table[(c - 0x20) * width];
+   const uint8_t *glyph = &font_table[(c - 0x20) * width];
 
-    oled_data_stream((uint8_t*)glyph, width);
+   /* Send glyph */
+   oled_data_stream((uint8_t*)glyph, width);
 
-    global_x += width;
+  /* Add 1 column spacing */
+   uint8_t space = 0x00;
+   oled_data_stream(&space, 1);
+
+   global_x += (width + 1);
 }
 
 void ssd1306_oled_putc(uint8_t size, char c)
@@ -270,12 +275,22 @@ uint8_t ssd1306_oled_draw_pixel_vline(uint8_t x_pixel,
 void ssd1306_oled_puts_center(uint8_t page, const char *str)
 {
     uint8_t len = strlen(str);
-    if (len > 16) len = 16;
 
-    uint8_t start_col = (16 - len) / 2;
+    uint8_t char_width;
 
-    ssd1306_oled_set_XY(start_col * 8, page);
-    ssd1306_oled_puts(SSD1306_FONT_NORMAL, str);
+    if (SSD1306_FONT_SMALL == SSD1306_FONT_SMALL)
+        char_width = 6;   // 5 + 1 spacing
+    else
+        char_width = 9;   // 8 + 1 spacing (if you added spacing there too)
+
+    uint16_t total_width = len * char_width;
+
+    if (total_width > SSD1306_WIDTH)
+        total_width = SSD1306_WIDTH;
+
+    uint8_t start_x = (SSD1306_WIDTH - total_width) / 2;
+
+    ssd1306_oled_set_XY(start_x, page);
+    ssd1306_oled_puts(SSD1306_FONT_SMALL, str);
 }
-
 
