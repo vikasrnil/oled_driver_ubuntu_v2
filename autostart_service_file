@@ -1,8 +1,8 @@
-1. compile the code and make executable file, then copy (cp oled_app /usr/local/bin/) 
-2. make file sudo nano /etc/systemd/system/oled_app.service 
-3. sudo systemctl start oled_app.service
-4. To enable on boot ( sudo systemctl enable oled_app.service )
-5. Now reboot or sudo systemctl daemon-reload
+//1. compile the code and make executable file, then copy (cp oled_app /usr/local/bin/) 
+//2. make file sudo nano /etc/systemd/system/oled_app.service 
+//3. sudo systemctl start oled_app.service
+//4. To enable on boot ( sudo systemctl enable oled_app.service )
+//5. Now reboot or sudo systemctl daemon-reload
 
 
 [Unit]
