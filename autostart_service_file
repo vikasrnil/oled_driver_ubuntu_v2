@@ -5,6 +5,23 @@
 //5. Now reboot or sudo systemctl daemon-reload
 
 
+step1. create i2c group and add your user to the i2c group
+sudo groupadd i2c  
+sudo usermod -aG i2c ubuntu
+
+Check:
+groups ubuntu
+
+step2. Create udev rules
+sudo nano /etc/udev/rules.d/99-i2c.rules
+# All I2C devices belong to group i2c
+KERNEL=="i2c-[0-9]*", MODE="0777", GROUP="i2c"
+
+step3. Reload udev
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+
 [Unit]
 Description=My C Application
 After=network-online.target
